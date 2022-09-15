@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.chentong.mvnbook.account</groupId>
+    <artifactId>account-email</artifactId>
+    <version>1.1-SNAPSHOT</version>
+    <name>Account Email</name>
+    
+    <!--远程仓库的配置-->
+    <!--<repositories>
+        <repository>
+            &lt;!&ndash;定义唯一标识为jboss,如果定义为central，将覆盖maven默认的中央仓库配置，因为maven默认的id就是central&ndash;&gt;
+            &lt;!&ndash;maven默认的中央仓库配置路径在：maven-model-builder-3.8.5.jar\org\apache\maven\model\pom.4.0.0.xml&ndash;&gt;
+            <id>aliyun</id>
+            <name>Aliyun Repository</name>
+            <url>https://maven.aliyun.com/repository/public/</url>
+            &lt;!&ndash;开启aliyun仓库的发布版本的下载支持&ndash;&gt;
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            &lt;!&ndash;关闭JBoss仓库的快照版本的下载支持&ndash;&gt;
+            <snapshots>
+                <enabled>false</enabled>
+                &lt;!&ndash;updatePolicy配置maven从远程仓库检查更新的频率&ndash;&gt;
+                &lt;!&ndash;默认为daily，表示maven每天检查一次&ndash;&gt;
+                &lt;!&ndash;never：从不检查更新&ndash;&gt;
+                &lt;!&ndash;always：每次构建都检查更新&ndash;&gt;
+                &lt;!&ndash;interval:x 每隔x分钟检查一次更新（x为任意整数）&ndash;&gt;
+                <updatePolicy>daily</updatePolicy>
+                &lt;!&ndash;checksumPolicy配置maven检查检验和文件的策略,当构建被部署到maven仓库中时&ndash;&gt;
+                &lt;!&ndash;会同时部署对应的校验和文件，在下载构建的时候，maven会验证和文件，&ndash;&gt;
+                &lt;!&ndash;如果校验和验证失败，会怎么办？&ndash;&gt;
+                &lt;!&ndash;默认为warn：maven会在执行构建时输出警告信息&ndash;&gt;
+                &lt;!&ndash;fail：maven遇到校验和错误就让构建失败&ndash;&gt;
+                &lt;!&ndash;ignore：使maven完全忽略校验和错误&ndash;&gt;
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            &lt;!&ndash;表示仓库的布局是maven2与maven3的默认布局，而不是maven的布局&ndash;&gt;
+            <layout>default</layout>
+        </repository>
+    </repositories>-->
+    
+    <!--部署到远程仓库的配置-->
+    <!--通过执行:mvn clean deploy,将当前项目构建输出的构建部署到配置的对应的远程仓库-->
+    <!--如果当前版本是快照版本（版本号后面跟着SNAPSHOT就是快照版本）就会部署到快照版本的仓库地址-->
+    <!--如果当前版本是发布版本（版本号后面没有SNAPSHOT就是发布版本）就会部署到发布版本的仓库地址-->
+    <!--注意，如果同一个发布版本已经部署过到私服仓库，就不能再次执行deploy命令，因为私服上面已经存在当前版本，需要修改版本好才能再次deploy-->
+    <!--repository发布版本（当前项目的version版本号后面没有-SNAPSHOT）：每个版本只能提交一次，无法重复提交私服，如果重复提交发布版本（也就是去掉了-SNAPSHOT），maven会部署失败，执行错误-->
+    <!--snapshotRepository快照版本（当前项目的version版本号后面存在-SNAPSHOT）：可以多次提交快照版本，提交到私服上面会以当前的时间搓来确定版本，例如/com/chentong/mvnbook/account/account-email/1.1-SNAPSHOT/account-email-1.1-20220526.081908-2.pom-->
+    <distributionManagement>
+        <!--发布版本构建的仓库-->
+        <repository>
+            <!--注意，上传到发布版本的仓库，不能是中央仓库central，否则无法上传，因为central是私服用于自己去远程仓库下载的仓库，无法通过本地去上传-->
+            <!--注意，上传到仓库需要认证，也就是需要在setting.xml文件内配置servers配置，对应server下的id,应该与如下的id保持一致-->
+            <id>releases</id>
+            <name>Orchard Releases Repository</name>
+            <url>http://58.213.214.82:18081/nexus/content/repositories/my/</url>
+        </repository>
+        <!--快照版本构建的仓库-->
+        <snapshotRepository>
+            <!--注意，上传到仓库需要认证，也就是需要在setting.xml文件内配置servers配置，对应server下的id,应该与如下的id保持一致-->
+            <id>snapshots</id>
+            <name>Orchard Snapshots Repository</name>
+            <url>http://58.213.214.82:18081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
+    
+    <!--定义自定义常量，提供全局共享常量值-->
+    <properties>
+        <springframework.version>5.3.20</springframework.version>
+        <java.version>1.8</java.version>
+        <java.encoding>utf8</java.encoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+    
+    <!--声明一个或多个项目依赖-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <!--使用自定义常量，全局指定第三方依赖的版本-->
+            <version>${springframework.version}</version>
+            <!--依赖的类型，对应项目坐标定义的packaging，默认值为jar-->
+            <type>jar</type>
+            
+            <!--依赖的范围-->
+            <!--compile：编译依赖范围，默认使用该依赖范围，对于编译，测试，运行三种classpath都有效。典型的例子：spring-core-->
+            <!--test：测试依赖范围。只对于测试classpath有效，在编译主代码或运行项目的使用时将无法使用此类依赖。典型的例子：JUnit-->
+            <!--provided：已提供依赖范围。对编译和测试classpath有效，但在运行时无效。典型的例子：servlet-api,编译和运行的时候需要该依赖，但在运行项目的时候，由于容器已经提供，就不需要maven重复的引入-->
+            <!--runtime：运行时依赖范围。对测试和运行时classpath有效，但在编译主代码时无效。典型的例子：JDBC驱动实现，项目主代码的编译只需要JDK提供的JDBC接口，只有在执行测试或者运行项目的时候才需要实现上述接口的具体JDBC驱动。-->
+            <!--system：系统依赖范围。该依赖与三种classpath的关系，和provided依赖范围完全一致，但是，使用system范围的依赖时必须通过systemPath元素显式地指定依赖文件的路径。-->
+            <!--import：导入依赖范围。该依赖范围不会对三种classpath产生实际的影响-->
+            <scope>compile</scope>
+            
+            <!--标记依赖是否可选,默认值false-->
+            <optional>false</optional>
+            
+            <!--用来排除传递性依赖-->
+            <!--如下配置说明：-->
+            <!--当前项目依赖spring-core，但是spring-core下依赖spring-jcl下某一个不稳定性版本-->
+            <!--所以通过exclusions，指定排除在spring-core项目中对spring-jcl版本的依赖-->
+            <!--并且，当前项目自己显式的声明对spring-jcl的项目依赖，版本为5.3.20-->
+            <exclusions>
+                <!--排除spring-core项目内对spring-jcl的依赖，当前项目通过直接对spring-jcl项目的指定版本进行依赖-->
+                <!--不通过第三方项目的依赖关系来控制版本，这里忽略第三方的某一个项目依赖-->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--上面演示了排除某项目对第三方项目的依赖-->
+        <!--下面演示了不由某项目对第三方依赖，而是自己指定第三方依赖的版本-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jcl</artifactId>
+            <version>${springframework.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.6.5</version>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <!-- 指明编译源代码时使用的字符编码，maven编译的时候默认使用的GBK编码， 通过encoding属性设置字符编码，告诉maven这个项目使用UTF-8来编译 -->
+                    <encoding>${java.encoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
